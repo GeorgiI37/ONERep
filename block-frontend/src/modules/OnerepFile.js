@@ -137,6 +137,7 @@ const OneRepFileModule = (props) => {
             setProgress(Math.round((100 * event.loaded) / event.total));
         })
         .then((response) => {
+            alert(response.data.message);
             Papa.parse(files[0], {
                 header: true,
                 skipEmptyLines: true,

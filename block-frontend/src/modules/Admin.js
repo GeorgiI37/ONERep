@@ -41,7 +41,10 @@ const AdminModule = (props) => {
         curUser.isAdmin = admin;
         curUser.status = enable;
         axios.post(SERVER_URL + '/users/update', curUser).then(response => {
-            setUsers(response.data);
+            if (response.data.success == true)
+                setUsers(response.data.users);
+            else
+                alert(response.data.error);
         });
     }
 
@@ -70,7 +73,11 @@ const AdminModule = (props) => {
                 <div className="zl_all_page_notify_logout_btn">
                     <ul className="v-link">
                         <li><button className="btn-connect"><FaPencilAlt /> Settings</button></li>
-                        <li><button className="btn-connect" onClick={()=>{handleShow(defaultUser)}}>Add Contributor</button></li>
+                        <li><button className="btn-connect" onClick={()=>{
+                            setSAdmin(false)
+                            setEnable(false)
+                            handleShow(defaultUser)
+                        }}>Add Contributor</button></li>
                     </ul>
                 </div>
             </div>
@@ -93,8 +100,12 @@ const AdminModule = (props) => {
                             <td><FaUserAlt/><span className="pl-2">{item.username}</span></td>
                             <td>{item.wallet}</td>
                             <td>{item.isAdmin ? 'Admin' : '-'}</td>
-                            <td>0</td>
-                            <td><FaPencilAlt onClick={()=>{handleShow(item)}} /> <span className="ml-2"><FaTrashAlt onClick={()=>{handleDelete(item)}} className="text-danger"/></span></td>
+                            <td>{item.received}</td>
+                            <td><FaPencilAlt onClick={()=>{
+                                setSAdmin(item.isAdmin);
+                                setEnable(item.status);
+                                handleShow(item)}
+                            } /> <span className="ml-2"><FaTrashAlt onClick={()=>{handleDelete(item)}} className="text-danger"/></span></td>
                         </tr>
                     ))}
                     </tbody>
@@ -123,7 +134,7 @@ const AdminModule = (props) => {
                                 <Form.Label className="text-muted-dark">Are They Admin?</Form.Label>
                                 <ToggleButton
                                     name="isAdmin"
-                                    value={ admin|| false|| curUser.isAdmin }
+                                    value={ false|| admin }
                                     inactiveLabel="No"
                                     activeLabel="Yes"
                                     thumbStyle={borderRadiusStyle}
@@ -136,7 +147,7 @@ const AdminModule = (props) => {
                                 <Form.Label className="text-muted-dark">Enable</Form.Label>
                                 <ToggleButton
                                     name="status"
-                                    value={ enable|| false ||curUser.status }
+                                    value={ enable|| false }
                                     inactiveLabel="No"
                                     activeLabel="Yes"
                                     thumbStyle={borderRadiusStyle}

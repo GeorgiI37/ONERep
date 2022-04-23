@@ -62,6 +62,7 @@ const HomePageModule = (props) => {
             alert("install metamask extension!!");
           }
     };
+    
     // Function for login
     const accountLogin = (account) => {
         axios.post(SERVER_URL + '/users/login', {wallet: account})

@@ -78,32 +78,48 @@ exports.getOneRepBoard = async(req, res) => {
 }
 
 exports.update = async (req, res) => {
-    User.findOne(req.body._id == '' ? {username: ''} : {wallet: req.body.wallet}).then((user) => {
+    User.findOne({wallet: req.body.wallet}).then((user) => {
         var puser = user;
         if (req.body._id == '')
         {
-            puser = new User({
-                username: req.body.username,
-                wallet: req.body.wallet,
-                badge: req.body.badge,
-                dao: req.body.dao,
-                isAdmin: req.body.isAdmin,
-                status: req.body.status
-            });
+            if (user)
+            {
+                return res.status(200).send({error: "ETH address duplicated!", success: false});
+            }
+            else
+            {
+                puser = new User({
+                    username: req.body.username,
+                    wallet: req.body.wallet,
+                    badge: req.body.badge,
+                    dao: req.body.dao,
+                    isAdmin: req.body.isAdmin,
+                    status: req.body.status
+                });
+            }
         }
         else
         {
-            puser.username = req.body.username;
-            puser.wallet = req.body.wallet;
-            puser.badge = req.body.badge;
-            puser.dao = req.body.dao;
-            puser.isAdmin = req.body.isAdmin;
-            puser.status = req.body.status;
+            if (!puser)
+            {
+                return res.status(200).send({error: "This accout does not exist!", success: false});
+            }
+            else
+            {
+                puser.username = req.body.username;
+                puser.wallet = req.body.wallet;
+                puser.badge = req.body.badge;
+                puser.dao = req.body.dao;
+                puser.isAdmin = req.body.isAdmin;
+                puser.status = req.body.status;
+            }
         }
         puser.save().then((result) => {
-            res.redirect(SERVER_URL + '/admin');
+            User.find({}).then((users) => {
+                res.status(200).send({users: users, success: true});
+            });
         }).catch((err) => {
-            res.status(200).send({success: false});
+            res.status(200).send({success: false, error: "Error Occured!"});
         });
     });
 }
